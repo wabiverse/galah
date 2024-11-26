@@ -4,7 +4,7 @@ import CompilerPluginSupport
 import Foundation
 import PackageDescription
 
-let noWasm = ProcessInfo.processInfo.environment["NO_WASM"] == "1"
+let yesWasm = ProcessInfo.processInfo.environment["YES_WASM"] == "1"
 
 let wasmTarget: Target = .executableTarget(
     name: "GalahWeb",
@@ -34,16 +34,15 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.3.0"),
         .package(
-            url: "https://github.com/apple/swift-syntax.git",
-            from: "510.0.3"
+            url: "https://github.com/swiftlang/swift-syntax.git",
+            from: "600.0.1"
         ),
         .package(
             url: "https://github.com/stackotter/swift-macro-toolkit",
-            from: "0.4.0"
+            from: "0.6.0"
         ),
-        .package(url: "https://github.com/swiftwasm/carton", from: "1.1.2"),
-        .package(url: "https://github.com/swiftwasm/JavaScriptKit", exact: "0.20.0"),
-    ],
+        .package(url: "https://github.com/swiftwasm/carton", from: "1.1.2")
+    ] + (yesWasm ? [.package(url: "https://github.com/swiftwasm/JavaScriptKit", exact: "0.20.0")] : []),
     targets: [
         .executableTarget(
             name: "galah",
@@ -74,5 +73,5 @@ let package = Package(
             name: "GalahInterpreterTests",
             dependencies: ["GalahInterpreter"]
         ),
-    ] + (noWasm ? [] : [wasmTarget])
+    ] + (yesWasm ? [wasmTarget] : [])
 )
